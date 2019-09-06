@@ -16,7 +16,7 @@ class K2Batt {
    destroy() {
 	   log ("Destroy K2Batt");
       this.aggregateMenu._indicators.replace_child(
-         this.customIndicator.indicators,"
+         this.customIndicator.indicators,
          this.originalIndicator.indicators
       );
    }
