@@ -1,11 +1,11 @@
 {
-  "description": "beta version for K2 battery %", 
-  "name": "K2 battery", 
+  "description": "beta version for K2 battery %",
+  "name": "K2 battery",
   "shell-version": [
-    "3.28", 
-    "3.30", 
+    "3.28",
+    "3.30",
     "3.32"
-  ], 
-  "uuid": "k2Batt@brightstone8x.gmail.com", 
+  ],
+  "uuid": "k2Batt-brightstone8x.gmail.com",
   "version": "0.1"
 }
