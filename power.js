@@ -1,26 +1,39 @@
 const Lang = imports.lang;
-const { Clutter, Gio, St, UPowerGlib: UPower } = imports.gi;
+const { Gio, UPowerGlib: UPower } = imports.gi;
 const BaseIndicator = imports.ui.status.power.Indicator;
 const Power = imports.ui.status.power
 const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(Power.DisplayDeviceInterface);
-var kb;
-var Indicator = class extends BaseIndicator {
+const BUS_NAME = 'org.freedesktop.UPower';
+let  kb;
+
+const findKeyboard = () => {
+	log("[k2 batt] findKeyboard");
+	let upowerClient = UPower.Client.new_full(null);
+	let devices = upowerClient.get_devices();
+	let i;
+	for (i=0; i < devices.length; i++){
+		if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
+			return devices[i];
+		}
+	}
+}
+
+let  Indicator = class extends BaseIndicator {
 
 	constructor(){
 		log("[k2 batt] new indicator");
-		log("[k2 batt] findKeyboard");
-		let upowerClient = imports.gi.UPowerGlib.Client.new_full(null);
+		kb = findKeyboard();
+		let upowerClient = UPower.Client.new_full(null);
 		let devices = upowerClient.get_devices();
 		let i;
 		for (i=0; i < devices.length; i++){
-			let objPath = devices[i].get_object_path();
-			if (objPath.includes("keyboard_hid_")){
+			if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
 				kb = devices[i];
 			}
 		}
 		super();
 		this._proxy = new PowerManagerProxy(Gio.DBus.system,
-											'org.freedesktop.UPower',
+											BUS_NAME,
 											kb.get_object_path(),
                                             (proxy, error) => {
                                                 if (error) {
@@ -47,7 +60,7 @@ var Indicator = class extends BaseIndicator {
    }
 
    _sync() {
-		log("[k2 batt] _sync " + kb.get_object_path());
+		log("[k2 batt] _sync: " + kb.model +" | "+ kb.native_path);
 		super._sync();
 		this._percentageLabel.clutter_text.set_markup('<span size="smaller">' + this._getBatteryStatus() + '</span>');
    }

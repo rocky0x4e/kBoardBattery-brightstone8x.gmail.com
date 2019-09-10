@@ -4,7 +4,7 @@ const Panel = imports.ui.main.panel;
 
 class KBatt {
    constructor() {
-   log("[k2 batt] new");
+   log("[k2 batt] new kbatt");
       this.aggregateMenu = Panel.statusArea['aggregateMenu'];
       this.originalIndicator = this.aggregateMenu._power;
       this.customIndicator = new localLib.imports.power.Indicator();
