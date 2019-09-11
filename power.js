@@ -4,8 +4,8 @@ const BaseIndicator = imports.ui.status.power.Indicator;
 const Power = imports.ui.status.power
 const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(Power.DisplayDeviceInterface);
 const BUS_NAME = 'org.freedesktop.UPower';
-let  kb;
 
+var kb;
 const findKeyboard = () => {
 	log("[k2 batt] findKeyboard");
 	let upowerClient = UPower.Client.new_full(null);
@@ -33,19 +33,21 @@ let  Indicator = class extends BaseIndicator {
                                                     log(error.message);
                                                     return;
                                                 }
+                                                log ("[k2 batt] proxy callback");
                                                 this._proxy.connect('g-properties-changed',
 												this._sync.bind(this));
                                                 this._sync();
                                             });
+		log("[k2 batt] new indicator : DONE");
+
 	}
 	
-   _getBatteryStatus() {
+   _getBatteryStatus(kb) {
 		log("[k2 batt] read battery info");
 		try {
 			kb.refresh_sync(null);
 		} catch (err) {
-			log("[k2 batt] no batt found ");
-			return "N/A";
+			log("[k2 batt] WTF: " + error);
 		}
 		let percentage = kb.percentage +"%";
 		log("[k2 batt] " + percentage);
@@ -53,8 +55,17 @@ let  Indicator = class extends BaseIndicator {
    }
 
    _sync() {
-		log("[k2 batt] _sync: " + kb.model +" | "+ kb.native_path);
-		super._sync();
-		this._percentageLabel.clutter_text.set_markup('<span size="smaller">' + kb.model+ ": " + this._getBatteryStatus() + '</span>');
+	   log("[k2 batt] _sync: begin" )
+	   let text;
+		try {
+			log("[k2 batt] _sync: " + kb.model +" | "+ kb.native_path);
+			super._sync();
+			text = kb.model+ ": " + this._getBatteryStatus(kb);
+		} catch (err) {
+			log("[k2 batt] no batt found ");
+			text = "n/a";
+		}
+	
+		this._percentageLabel.clutter_text.set_markup('<span size="smaller">' + text + '</span>');
    }
 }
