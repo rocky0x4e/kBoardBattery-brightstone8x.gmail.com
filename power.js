@@ -23,14 +23,7 @@ let  Indicator = class extends BaseIndicator {
 	constructor(){
 		log("[k2 batt] new indicator");
 		kb = findKeyboard();
-		let upowerClient = UPower.Client.new_full(null);
-		let devices = upowerClient.get_devices();
-		let i;
-		for (i=0; i < devices.length; i++){
-			if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
-				kb = devices[i];
-			}
-		}
+		
 		super();
 		this._proxy = new PowerManagerProxy(Gio.DBus.system,
 											BUS_NAME,
@@ -54,7 +47,7 @@ let  Indicator = class extends BaseIndicator {
 			log("[k2 batt] no batt found ");
 			return "N/A";
 		}
-		let percentage = "KChron " + kb.percentage +"%";
+		let percentage = kb.percentage +"%";
 		log("[k2 batt] " + percentage);
 		return percentage;		
    }
@@ -62,6 +55,6 @@ let  Indicator = class extends BaseIndicator {
    _sync() {
 		log("[k2 batt] _sync: " + kb.model +" | "+ kb.native_path);
 		super._sync();
-		this._percentageLabel.clutter_text.set_markup('<span size="smaller">' + this._getBatteryStatus() + '</span>');
+		this._percentageLabel.clutter_text.set_markup('<span size="smaller">' + kb.model+ ": " + this._getBatteryStatus() + '</span>');
    }
 }
