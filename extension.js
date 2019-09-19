@@ -4,21 +4,15 @@ const Panel = imports.ui.main.panel;
 
 class KBatt {
    constructor() {
-   log("[k2 batt] new kbatt");
-      this.aggregateMenu = Panel.statusArea['aggregateMenu'];
-      this.originalIndicator = this.aggregateMenu._power;
-      this.customIndicator = new localLib.imports.power.Indicator();
-      this.aggregateMenu._indicators.replace_child(
-         this.originalIndicator.indicators,
-         this.customIndicator.indicators
-      );
+		log("[k2 batt] new kbatt");
+
+		this.customIndicator = new localLib.imports.kPower.Indicator();
+		Panel._rightBox.insert_child_at_index(localLib.imports.kPower.button,0);
    }
    destroy() {
 		log("[k2 batt] destroy");
-      this.aggregateMenu._indicators.replace_child(
-         this.customIndicator.indicators,
-         this.originalIndicator.indicators
-      );
+		Panel._rightBox.remove_child(localLib.imports.kPower.button);
+		this.customIndicator.destroy();
    }
 }
 
@@ -26,7 +20,7 @@ let keyboard;
 
 function enable() {
 	log("[k2 batt] enable");
-   keyboard = new KBatt();
+	keyboard = new KBatt();
 }
 
 function disable() {
