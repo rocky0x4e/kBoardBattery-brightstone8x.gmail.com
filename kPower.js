@@ -27,8 +27,39 @@ let button = new St.Bin({ style_class: 'panel-button',
 
 let Power = class extends PowerManagerProxy {
 	constructor(){
-
+		super();
+		this.g_connection = Gio.DBus.system;
+		this.g_interface_name = BUS_NAME;
+		//this.g_interface_info = info;
+		//this.g_name= name;
+		this.g_object_path = kb.get_object_path();
 	}
+   _getBatteryStatus(kb) {
+		log("[k2 batt] read battery info");
+		try {
+			kb.refresh_sync(null);
+		} catch (err) {
+			log("[k2 batt] WTF: " + err.message);
+		}
+		let percentage = kb.percentage +"%";
+		log("[k2 batt] " + percentage);
+		return percentage;
+   }
+
+	_sync() {
+	   log("[k2 batt] _sync: begin" )
+	   let text;
+		try {
+			log("[k2 batt] _sync: " + kb.model + " | " + kb.native_path);
+			text = kb.model+ ": " + this._getBatteryStatus(kb);
+		} catch (err) {
+			log("[k2 batt] no batt found ");
+			log(err.message);
+			text = "n/a";
+		}
+		log(text);
+
+   }
 }
 
 let  Indicator = class extends BaseIndicator {
@@ -43,19 +74,20 @@ let  Indicator = class extends BaseIndicator {
 		button.set_child(icon);
 
 		this._proxy = new PowerManagerProxy(Gio.DBus.system,
-											BUS_NAME,
-											kb.get_object_path(),
-                                            (proxy, error) => {
-                                                if (error) {
-													log("[k2 batt] PANIC");
-                                                    log(error.message);
-                                                    return;
-                                                }
-                                                log ("[k2 batt] proxy callback");
-                                                this._proxy.connect('g-properties-changed',
-													this._sync.bind(this));
-                                                this._sync();
-                                            });
+									BUS_NAME,
+									kb.get_object_path(),
+									(proxy, error) => {
+										if (error) {
+											log("[k2 batt] PANIC");
+															 log(error.message);
+															 return;
+										}
+										log ("[k2 batt] proxy callback");
+										this._proxy.connect('g-properties-changed',
+											this._sync.bind(this));
+										this._sync();
+								  }
+								);
 		log("[k2 batt] new indicator : DONE");
 
 	}
