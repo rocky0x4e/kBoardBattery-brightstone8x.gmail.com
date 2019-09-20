@@ -1,17 +1,20 @@
 const ExtensionUtils = imports.misc.extensionUtils;
-const localLib = ExtensionUtils.getCurrentExtension();
+const localLib = ExtensionUtils.getCurrentExtension().imports.kPower;
+const Log = localLib.Log;
 const Panel = imports.ui.main.panel;
 
 class KBatt {
    constructor() {
-		log("[k2 batt] new kbatt");
-
-		this.customIndicator = new localLib.imports.kPower.Indicator();
-		Panel._rightBox.insert_child_at_index(localLib.imports.kPower.button,0);
+		Log("test indicator");
+		this.test = new localLib.kBattIndicator();
+		
+		Log("new kbatt");
+		this.customIndicator = new localLib.Indicator();
+		Panel._rightBox.insert_child_at_index(localLib.button,0);
    }
    destroy() {
-		log("[k2 batt] destroy");
-		Panel._rightBox.remove_child(localLib.imports.kPower.button);
+		Log("destroy");
+		Panel._rightBox.remove_child(localLib.button);
 		this.customIndicator.destroy();
    }
 }
@@ -19,7 +22,7 @@ class KBatt {
 let keyboard;
 
 function enable() {
-	log("[k2 batt] enable");
+	Log("enable");
 	keyboard = new KBatt();
 }
 

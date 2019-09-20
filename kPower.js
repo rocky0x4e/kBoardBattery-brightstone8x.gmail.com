@@ -7,7 +7,7 @@ const BUS_NAME = 'org.freedesktop.UPower';
 
 var kb;
 const findKeyboard = () => {
-	log("[k2 batt] findKeyboard");
+	Log("findKeyboard");
 	let upowerClient = UPower.Client.new_full(null);
 	let devices = upowerClient.get_devices();
 	let i;
@@ -18,53 +18,79 @@ const findKeyboard = () => {
 	}
 }
 
+const kBattIndicator = new Lang.Class({
+
+	Name : "Keychron Battery Indicator", 
+
+	_init: function () {
+		this.keyboard = this.findKeyboard();
+		this.indicator = new St.Bin({ style_class: 'panel-button',
+                          reactive: true,
+                          can_focus: true,
+                          x_fill: true,
+                          y_fill: false,
+                          track_hover: true });
+		this.icon = new St.Icon({ icon_name: 'input-keyboard',
+					 style_class: 'system-status-icon' });
+
+		this.indicator.set_child(this.icon);
+		
+		this.proxy = Gio.DBusProxy();
+	},
+
+	findKeyboard : function () {
+		Log("findKeyboard");
+		let upowerClient = UPower.Client.new_full(null);
+		let devices = upowerClient.get_devices();
+		let i;
+		for (i=0; i < devices.length; i++){
+			if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
+				return devices[i];
+			}
+		}
+	},
+	
+	sync : function () {
+		Log("_sync: begin" )
+		let text;
+		try {
+			Log("_sync: " + this.keyboard.model + " | " + this.keyboard.native_path);
+			text = this.keyboard.model+ ": " + this.getBatteryStatus(this.keyboard);
+		} catch (err) {
+			Log("no batt found ");
+			Log(err.message);
+			text = "n/a";
+		}
+		Log(text);
+	},
+
+	getBatteryStatus : function () {
+		Log("read battery info");
+		try {
+			this.keyboard.refresh_sync(null);
+		} catch (err) {
+			Log("WTF: " + err.message);
+		}
+		let percentage = this.keyboard.percentage +"%";
+		Log(percentage);
+		return percentage;
+	}
+});
+
+const Log = function(msg) {
+	log ("[k2] " + msg);
+}
+//~ -----------------------------------------------------------
 let button = new St.Bin({ style_class: 'panel-button',
                           reactive: true,
                           can_focus: true,
                           x_fill: true,
                           y_fill: false,
                           track_hover: true });
-
-let Power = class extends PowerManagerProxy {
-	constructor(){
-		super();
-		this.g_connection = Gio.DBus.system;
-		this.g_interface_name = BUS_NAME;
-		//this.g_interface_info = info;
-		//this.g_name= name;
-		this.g_object_path = kb.get_object_path();
-	}
-   _getBatteryStatus(kb) {
-		log("[k2 batt] read battery info");
-		try {
-			kb.refresh_sync(null);
-		} catch (err) {
-			log("[k2 batt] WTF: " + err.message);
-		}
-		let percentage = kb.percentage +"%";
-		log("[k2 batt] " + percentage);
-		return percentage;
-   }
-
-	_sync() {
-	   log("[k2 batt] _sync: begin" )
-	   let text;
-		try {
-			log("[k2 batt] _sync: " + kb.model + " | " + kb.native_path);
-			text = kb.model+ ": " + this._getBatteryStatus(kb);
-		} catch (err) {
-			log("[k2 batt] no batt found ");
-			log(err.message);
-			text = "n/a";
-		}
-		log(text);
-
-   }
-}
-
+                          
 let  Indicator = class extends BaseIndicator {
 	constructor(){
-		log("[k2 batt] new indicator");
+		Log("new indicator");
 		kb = findKeyboard();
 
 		super();
@@ -78,44 +104,43 @@ let  Indicator = class extends BaseIndicator {
 									kb.get_object_path(),
 									(proxy, error) => {
 										if (error) {
-											log("[k2 batt] PANIC");
-															 log(error.message);
+											Log("PANIC");
+															 Log(error.message);
 															 return;
 										}
-										log ("[k2 batt] proxy callback");
+										Log ("proxy callback");
 										this._proxy.connect('g-properties-changed',
 											this._sync.bind(this));
 										this._sync();
 								  }
 								);
-		log("[k2 batt] new indicator : DONE");
+		Log("new indicator : DONE");
 
 	}
 
    _getBatteryStatus(kb) {
-		log("[k2 batt] read battery info");
+		Log("read battery info");
 		try {
 			kb.refresh_sync(null);
 		} catch (err) {
-			log("[k2 batt] WTF: " + err.message);
+			Log("WTF: " + err.message);
 		}
 		let percentage = kb.percentage +"%";
-		log("[k2 batt] " + percentage);
+		Log("" + percentage);
 		return percentage;
    }
 
    _sync() {
-	   log("[k2 batt] _sync: begin" )
+	   Log("_sync: begin" )
 	   let text;
 		try {
-			log("[k2 batt] _sync: " + kb.model + " | " + kb.native_path);
+			Log("_sync: " + kb.model + " | " + kb.native_path);
 			text = kb.model+ ": " + this._getBatteryStatus(kb);
 		} catch (err) {
-			log("[k2 batt] no batt found ");
-			log(err.message);
+			Log("no batt found ");
+			Log(err.message);
 			text = "n/a";
 		}
-		log(text);
-
+		Log(text);
    }
 }
