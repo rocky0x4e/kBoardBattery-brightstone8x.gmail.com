@@ -1,12 +1,9 @@
 const Lang = imports.lang;
-const { Gio, UPowerGlib: UPower } = imports.gi;
+const { St, Gio, UPowerGlib: UPower } = imports.gi;
 const BaseIndicator = imports.ui.status.power.Indicator;
 const Power = imports.ui.status.power
 const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(Power.DisplayDeviceInterface);
 const BUS_NAME = 'org.freedesktop.UPower';
-const PanelMenu = imports.ui.panelMenu;
-const Clutter = imports.gi.Clutter;
-const St = imports.gi.St;
 
 var kb;
 const findKeyboard = () => {
@@ -21,7 +18,18 @@ const findKeyboard = () => {
 	}
 }
 
-let button = new St.Bin;
+let button = new St.Bin({ style_class: 'panel-button',
+                          reactive: true,
+                          can_focus: true,
+                          x_fill: true,
+                          y_fill: false,
+                          track_hover: true });
+
+let Power = class extends PowerManagerProxy {
+	constructor(){
+
+	}
+}
 
 let  Indicator = class extends BaseIndicator {
 	constructor(){
@@ -29,10 +37,11 @@ let  Indicator = class extends BaseIndicator {
 		kb = findKeyboard();
 
 		super();
-		
-		let text = St.Label.new('ple');
-		button.set_child(text);
-    
+
+		let icon = new St.Icon({ icon_name: 'input-keyboard',
+                             style_class: 'system-status-icon' });
+		button.set_child(icon);
+
 		this._proxy = new PowerManagerProxy(Gio.DBus.system,
 											BUS_NAME,
 											kb.get_object_path(),
@@ -50,7 +59,7 @@ let  Indicator = class extends BaseIndicator {
 		log("[k2 batt] new indicator : DONE");
 
 	}
-	
+
    _getBatteryStatus(kb) {
 		log("[k2 batt] read battery info");
 		try {
@@ -60,14 +69,14 @@ let  Indicator = class extends BaseIndicator {
 		}
 		let percentage = kb.percentage +"%";
 		log("[k2 batt] " + percentage);
-		return percentage;		
+		return percentage;
    }
 
    _sync() {
 	   log("[k2 batt] _sync: begin" )
 	   let text;
 		try {
-			log("[k2 batt] _sync: " + kb.model +" | "+ kb.native_path);
+			log("[k2 batt] _sync: " + kb.model + " | " + kb.native_path);
 			text = kb.model+ ": " + this._getBatteryStatus(kb);
 		} catch (err) {
 			log("[k2 batt] no batt found ");
@@ -75,7 +84,6 @@ let  Indicator = class extends BaseIndicator {
 			text = "n/a";
 		}
 		log(text);
-	
-		button.child.text = text;
+
    }
 }
