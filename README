@@ -1,0 +1,7 @@
+Battery indicator for keyboard. At first, I only want make this extention for my Keychron K2,
+but it should work with any keyboard in general as long as you can find it when running upower -d
+
+To install this extention from git
+   1. Go to "~/.local/share/gnome-shell/extensions"
+   2. Clone the source code from git:
+		git clone https://github.com/cobblestone88/kBoardBattery-brightstone8x.gmail.com.git
