@@ -1,15 +1,16 @@
 const Lang = imports.lang;
 const { St, Gio, UPowerGlib: UPower } = imports.gi;
-const BaseIndicator = imports.ui.status.power.Indicator;
 const Power = imports.ui.status.power
 const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(Power.DisplayDeviceInterface);
 const BUS_NAME = 'org.freedesktop.UPower';
+const PanelMenu = imports.ui.panelMenu;
+const PopupMenu = imports.ui.popupMenu;
+const Clutter    = imports.gi.Clutter;
 
-var kb;
 const findKeyboard = () => {
 	Log("findKeyboard");
-	let upowerClient = UPower.Client.new_full(null);
-	let devices = upowerClient.get_devices();
+	var upowerClient = UPower.Client.new_full(null);
+	var devices = upowerClient.get_devices();
 	let i;
 	for (i=0; i < devices.length; i++){
 		if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
@@ -20,22 +21,33 @@ const findKeyboard = () => {
 
 const kBattIndicator = new Lang.Class({
 
-	Name : "Keychron Battery Indicator", 
+	Name : "BtKeybBattIndicator",
+	Extends: PanelMenu.Button,
 
 	_init: function () {
-		this.keyboard = this.findKeyboard();
-		this.indicator = new St.Bin({ style_class: 'panel-button',
-                          reactive: true,
-                          can_focus: true,
-                          x_fill: true,
-                          y_fill: false,
-                          track_hover: true });
-		this.icon = new St.Icon({ icon_name: 'input-keyboard',
-					 style_class: 'system-status-icon' });
+		Log("Init kBattIndicator");
 
-		this.indicator.set_child(this.icon);
-		
-		this.proxy = Gio.DBusProxy();
+		this.parent(0.0, "BtKeybBattIndicator");
+
+		let hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box bt-keyb-batt-hbox' });
+		this.icon = new St.Icon({ icon_name: 'input-keyboard',
+					 style_class: 'system-status-icon bt-keyb-batt-icon' });
+		hbox.add_child(this.icon);
+
+		this.buttonText = new St.Label({
+				text: _('%'),
+				y_align: Clutter.ActorAlign.CENTER,
+				x_align: Clutter.ActorAlign.START
+		});
+		hbox.add_child(this.buttonText);
+
+		this.actor.add_child(hbox);
+
+		this.entryItem = new PopupMenu.PopupMenuItem("-- N/A --");
+		this.menu.addMenuItem(this.entryItem);
+
+		this.keyboard = this.findKeyboard();
+		this._newProxy();
 	},
 
 	findKeyboard : function () {
@@ -45,17 +57,21 @@ const kBattIndicator = new Lang.Class({
 		let i;
 		for (i=0; i < devices.length; i++){
 			if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
+				Log("Found: " + devices[i].model + " | " + devices[i].native_path);
 				return devices[i];
 			}
 		}
 	},
-	
-	sync : function () {
+
+	_sync : function () {
 		Log("_sync: begin" )
 		let text;
 		try {
+			var percent = this.getBatteryStatus();
 			Log("_sync: " + this.keyboard.model + " | " + this.keyboard.native_path);
-			text = this.keyboard.model+ ": " + this.getBatteryStatus(this.keyboard);
+			text = this.keyboard.model+ ": " + percent;
+			this.entryItem.label.set_text(text);
+			this.buttonText.set_text(percent);
 		} catch (err) {
 			Log("no batt found ");
 			Log(err.message);
@@ -74,34 +90,17 @@ const kBattIndicator = new Lang.Class({
 		let percentage = this.keyboard.percentage +"%";
 		Log(percentage);
 		return percentage;
-	}
-});
+	},
 
-const Log = function(msg) {
-	log ("[k2] " + msg);
-}
-//~ -----------------------------------------------------------
-let button = new St.Bin({ style_class: 'panel-button',
-                          reactive: true,
-                          can_focus: true,
-                          x_fill: true,
-                          y_fill: false,
-                          track_hover: true });
-                          
-let  Indicator = class extends BaseIndicator {
-	constructor(){
-		Log("new indicator");
-		kb = findKeyboard();
-
-		super();
-
-		let icon = new St.Icon({ icon_name: 'input-keyboard',
-                             style_class: 'system-status-icon' });
-		button.set_child(icon);
-
-		this._proxy = new PowerManagerProxy(Gio.DBus.system,
+	_newProxy : function(){
+		Log("Create new DBusProxy");
+		if (this.keyboard === undefined){
+			Log("Too bad, so sad, no bluetooth keyboard's detected, no proxy");
+		} else {
+			if (this._proxy === undefined) {
+				this._proxy = new	PowerManagerProxy(Gio.DBus.system,
 									BUS_NAME,
-									kb.get_object_path(),
+									this.keyboard.get_object_path(),
 									(proxy, error) => {
 										if (error) {
 											Log("PANIC");
@@ -114,33 +113,15 @@ let  Indicator = class extends BaseIndicator {
 										this._sync();
 								  }
 								);
-		Log("new indicator : DONE");
-
+			} else {
+				Log("Proxy existed");
+			}
+		}
 	}
+});
 
-   _getBatteryStatus(kb) {
-		Log("read battery info");
-		try {
-			kb.refresh_sync(null);
-		} catch (err) {
-			Log("WTF: " + err.message);
-		}
-		let percentage = kb.percentage +"%";
-		Log("" + percentage);
-		return percentage;
-   }
-
-   _sync() {
-	   Log("_sync: begin" )
-	   let text;
-		try {
-			Log("_sync: " + kb.model + " | " + kb.native_path);
-			text = kb.model+ ": " + this._getBatteryStatus(kb);
-		} catch (err) {
-			Log("no batt found ");
-			Log(err.message);
-			text = "n/a";
-		}
-		Log(text);
-   }
+const Log = function(msg) {
+	log ("[k2] " + msg);
 }
+
+

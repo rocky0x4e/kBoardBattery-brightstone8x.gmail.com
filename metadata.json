@@ -1,12 +1,12 @@
 {
-  "description": "beta version for K2 battery %",
-  "name": "K2 battery",
+  "description": "Battery indicator for keyboard. At first, I only want make this extention for my Keychron K2, but it should work with any keyboard in general as long as you can find it when running upower -d",
+  "name": "Keyboard battery",
   "shell-version": [
     "3.28",
     "3.30",
     "3.32"
   ],
-  "uuid": "k2Batt-brightstone8x.gmail.com",
+  "uuid": "kBoardBattery-brightstone8x.gmail.com",
   "version": "0.1",
-  "url": "https://github.com/cobblestone88/k2Batt-brightstone8x.gmail.com"
+  "url": "https://github.com/cobblestone88/kBoardBattery-brightstone8x.gmail.com"
 }
