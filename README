@@ -7,6 +7,7 @@ To install this extension from git
    1. From your terminal, go to "~/.local/share/gnome-shell/extensions"
    2. Clone the source code from git:
 	git clone https://github.com/cobblestone88/kBoardBattery-brightstone8x.gmail.com.git
+   3. Restart gnome-shell: Alt + F2, type 'r' then hit Enter
 
 *** KNOWN ISSUE ***
    1. Refresh time is 2 minutes by default (of DBusProxy) cannot change it for now
