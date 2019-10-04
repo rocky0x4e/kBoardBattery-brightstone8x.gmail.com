@@ -13,6 +13,8 @@ function enable() {
 
 function disable() {
 	Log("Disable");
+	localLib.dbusCon.signal_unsubscribe(btKeybBattIndicator.subIdAdd);
+	localLib.dbusCon.signal_unsubscribe(btKeybBattIndicator.subIdRem);
 	btKeybBattIndicator._proxy = null;
-   btKeybBattIndicator.destroy();
+	btKeybBattIndicator.destroy();
 }

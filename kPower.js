@@ -1,23 +1,26 @@
 const Lang = imports.lang;
 const { St, Gio, UPowerGlib: UPower } = imports.gi;
-const Power = imports.ui.status.power
-const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(Power.DisplayDeviceInterface);
+const xml ='<node>\
+   <interface name="org.freedesktop.UPower.Device">\
+      <property name="Type" type="u" access="read" />\
+      <property name="State" type="u" access="read" />\
+      <property name="Percentage" type="d" access="read" />\
+      <property name="TimeToEmpty" type="x" access="read" />\
+      <property name="TimeToFull" type="x" access="read" />\
+      <property name="IsPresent" type="b" access="read" />\
+      <property name="IconName" type="s" access="read" />\
+   </interface>\
+</node>';
+
+const PowerManagerProxy = Gio.DBusProxy.makeProxyWrapper(xml);
 const BUS_NAME = 'org.freedesktop.UPower';
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Clutter    = imports.gi.Clutter;
 
-const findKeyboard = () => {
-	Log("findKeyboard");
-	var upowerClient = UPower.Client.new_full(null);
-	var devices = upowerClient.get_devices();
-	let i;
-	for (i=0; i < devices.length; i++){
-		if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
-			return devices[i];
-		}
-	}
-}
+let dbusCon;
+let sigNameAdd;
+let sigNameRem;
 
 const kBattIndicator = new Lang.Class({
 
@@ -46,8 +49,42 @@ const kBattIndicator = new Lang.Class({
 		this.entryItem = new PopupMenu.PopupMenuItem("-- N/A --");
 		this.menu.addMenuItem(this.entryItem);
 
+		Log('dev listener');
+		var uPower_proxy = new PowerManagerProxy(
+			Gio.DBus.system,
+			BUS_NAME,
+			'/org/freedesktop/UPower',
+			(proxy,error)=>{
+				Log('+ _devConnectionListener +')
+					if (error) {
+						Log("PANIC");
+						Log(error.message);
+					}
+			});
+
+		dbusCon = uPower_proxy.get_connection();
+		sigNameAdd = 'DeviceAdded';
+		sigNameRem = 'DeviceRemoved';
+
+		let iname = 'org.freedesktop.UPower';
+		let sender = ':1.37' ;
+		let oPath = '/org/freedesktop/UPower/devices';
+
 		this.keyboard = this.findKeyboard();
 		this._newProxy();
+		this.subIdAdd = dbusCon.signal_subscribe(sender,iname,sigNameAdd,null, null,0,() => {
+				Log('Dev added')
+				this.keyboard = this.findKeyboard();
+				this._newProxy();
+					
+			});
+		this.subIdRem = dbusCon.signal_subscribe(sender,iname,sigNameRem,null, null,0,() => {
+				Log('Dev removed')
+				this._proxy = null;
+				this.keyboard = null;
+				this.entryItem.label.set_text('Keyboard is removed');
+				this.buttonText.set_text('%');
+			});	
 	},
 
 	findKeyboard : function () {
@@ -97,31 +134,30 @@ const kBattIndicator = new Lang.Class({
 		if (this.keyboard === undefined){
 			Log("Too bad, so sad, no bluetooth keyboard's detected, no proxy");
 		} else {
-			if (this._proxy === undefined) {
+			if (this._proxy === undefined || this._proxy === null) {
 				this._proxy = new	PowerManagerProxy(Gio.DBus.system,
 									BUS_NAME,
 									this.keyboard.get_object_path(),
 									(proxy, error) => {
+										Log ("Proxy callback function");
 										if (error) {
 											Log("PANIC");
-															 Log(error.message);
-															 return;
+											Log(error.message);
+											return;
 										}
-										Log ("proxy callback");
 										this._proxy.connect('g-properties-changed',
 											this._sync.bind(this));
 										this._sync();
-								  }
+									}
 								);
 			} else {
 				Log("Proxy existed");
 			}
 		}
 	}
+
 });
 
 const Log = function(msg) {
-	log ("[k2] " + msg);
+	log ("[kBoard] " + msg);
 }
-
-
