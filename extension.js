@@ -17,4 +17,5 @@ function disable() {
 	localLib.dbusCon.signal_unsubscribe(btKeybBattIndicator.subIdRem);
 	btKeybBattIndicator._proxy = null;
 	btKeybBattIndicator.destroy();
+	btKeybBattIndicator = null;
 }

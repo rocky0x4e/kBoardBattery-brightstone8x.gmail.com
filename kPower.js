@@ -67,7 +67,7 @@ const kBattIndicator = new Lang.Class({
 		sigNameRem = 'DeviceRemoved';
 
 		let iname = 'org.freedesktop.UPower';
-		let sender = ':1.37' ;
+		let sender = 'org.freedesktop.UPower' ;
 		let oPath = '/org/freedesktop/UPower/devices';
 
 		this.keyboard = this.findKeyboard();
@@ -76,7 +76,7 @@ const kBattIndicator = new Lang.Class({
 				Log('Dev added')
 				this.keyboard = this.findKeyboard();
 				this._newProxy();
-					
+
 			});
 		this.subIdRem = dbusCon.signal_subscribe(sender,iname,sigNameRem,null, null,0,() => {
 				Log('Dev removed')
@@ -84,7 +84,7 @@ const kBattIndicator = new Lang.Class({
 				this.keyboard = null;
 				this.entryItem.label.set_text('Keyboard is removed');
 				this.buttonText.set_text('%');
-			});	
+			});
 	},
 
 	findKeyboard : function () {
