@@ -23,5 +23,5 @@ This extension retrieve device's info using DBusProxy & GlibUPower, if you ever 
       method 1: Issue 'upower -d | grep keyboard -A 7' in your terminnal
       method 2: Run gnome-power-statistics
    2. Check gnome-shell log:
-      journalctl /usr/bin/gnome-shell | grep k2			 # this commmand will dump all gnome-shell log ever record
-      journalctl -f /usr/bin/gnome-shell | grep k2		 # this will only show new log
+      journalctl /usr/bin/gnome-shell | grep kBoard		# this commmand will dump all gnome-shell log ever record
+      journalctl -f /usr/bin/gnome-shell | grep kBoard		# this will only show new log
