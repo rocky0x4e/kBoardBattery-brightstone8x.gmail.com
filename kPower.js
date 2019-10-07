@@ -149,6 +149,11 @@ var kBattIndicator = new Lang.Class({
 				Log("Proxy existed");
 			}
 		}
+	},
+
+	reset : function (){
+		this.entryItem.destroy();
+		this.buttonText.destroy();
 	}
 
 });

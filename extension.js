@@ -15,6 +15,7 @@ function disable() {
 	kPower.dbusCon.signal_unsubscribe(btKeybBattIndicator.subIdAdd);
 	kPower.dbusCon.signal_unsubscribe(btKeybBattIndicator.subIdRem);
 	btKeybBattIndicator._proxy = null;
+	btKeybBattIndicator.reset();
 	btKeybBattIndicator.destroy();
 	btKeybBattIndicator = null;
 }
