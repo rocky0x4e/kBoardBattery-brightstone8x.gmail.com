@@ -18,11 +18,9 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Clutter    = imports.gi.Clutter;
 
-let dbusCon;
-let sigNameAdd;
-let sigNameRem;
+var dbusCon;
 
-const kBattIndicator = new Lang.Class({
+var kBattIndicator = new Lang.Class({
 
 	Name : "BtKeybBattIndicator",
 	Extends: PanelMenu.Button,
@@ -32,7 +30,7 @@ const kBattIndicator = new Lang.Class({
 
 		this.parent(0.0, "BtKeybBattIndicator");
 
-		let hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box bt-keyb-batt-hbox' });
+		var hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box bt-keyb-batt-hbox' });
 		this.icon = new St.Icon({ icon_name: 'input-keyboard',
 					 style_class: 'system-status-icon bt-keyb-batt-icon' });
 		hbox.add_child(this.icon);
@@ -63,22 +61,19 @@ const kBattIndicator = new Lang.Class({
 			});
 
 		dbusCon = uPower_proxy.get_connection();
-		sigNameAdd = 'DeviceAdded';
-		sigNameRem = 'DeviceRemoved';
 
-		let iname = 'org.freedesktop.UPower';
-		let sender = 'org.freedesktop.UPower' ;
-		let oPath = '/org/freedesktop/UPower/devices';
+		var iname = 'org.freedesktop.UPower';
+		var sender = 'org.freedesktop.UPower' ;
 
 		this.keyboard = this.findKeyboard();
 		this._newProxy();
-		this.subIdAdd = dbusCon.signal_subscribe(sender,iname,sigNameAdd,null, null,0,() => {
+		this.subIdAdd = dbusCon.signal_subscribe(sender,iname,'DeviceAdded',null, null,0,() => {
 				Log('Dev added')
 				this.keyboard = this.findKeyboard();
 				this._newProxy();
 
 			});
-		this.subIdRem = dbusCon.signal_subscribe(sender,iname,sigNameRem,null, null,0,() => {
+		this.subIdRem = dbusCon.signal_subscribe(sender,iname,'DeviceRemoved',null, null,0,() => {
 				Log('Dev removed')
 				this._proxy = null;
 				this.keyboard = null;
@@ -89,9 +84,9 @@ const kBattIndicator = new Lang.Class({
 
 	findKeyboard : function () {
 		Log("findKeyboard");
-		let upowerClient = UPower.Client.new_full(null);
-		let devices = upowerClient.get_devices();
-		let i;
+		var upowerClient = UPower.Client.new_full(null);
+		var devices = upowerClient.get_devices();
+		var i;
 		for (i=0; i < devices.length; i++){
 			if (devices[i].kind == UPower.DeviceKind.KEYBOARD){
 				Log("Found: " + devices[i].model + " | " + devices[i].native_path);
@@ -102,7 +97,7 @@ const kBattIndicator = new Lang.Class({
 
 	_sync : function () {
 		Log("_sync: begin" )
-		let text;
+		var text;
 		try {
 			var percent = this.getBatteryStatus();
 			Log("_sync: " + this.keyboard.model + " | " + this.keyboard.native_path);
@@ -124,7 +119,7 @@ const kBattIndicator = new Lang.Class({
 		} catch (err) {
 			Log("WTF: " + err.message);
 		}
-		let percentage = this.keyboard.percentage +"%";
+		var percentage = this.keyboard.percentage +"%";
 		Log(percentage);
 		return percentage;
 	},
@@ -158,6 +153,6 @@ const kBattIndicator = new Lang.Class({
 
 });
 
-const Log = function(msg) {
-	log ("[kBoard] " + msg);
+var Log = function(msg) {
+	log ("[kBatt] " + msg);
 }
