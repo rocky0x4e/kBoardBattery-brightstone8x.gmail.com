@@ -33,3 +33,20 @@ This extension retrieve device's info using DBusProxy & GlibUPower, if you ever 
    2. Check gnome-shell log:
       journalctl /usr/bin/gnome-shell | grep kBatt		# this commmand will dump all gnome-shell log ever record
       journalctl -f /usr/bin/gnome-shell | grep kBatt		# this will only show new log
+
+TIP FOR THOSE WHO'S USING KEYCHRON KEYBOARDS WITH LINUX
+=======================================================
+
+Here the best setup (I think so :D) for Keychron + Linux
+	Step 1: Set fkeyfirst by:
+	- Create the file /etc/modprobe.d/hid_apple.conf. Add this line to the file: "options hid_apple fnmode=2"
+	- Save the file and execute the following command: "sudo update-initramfs -u"
+	- Reboot
+	Step 2: Use the keyboard in Windows/Android mode
+	Step 3: If get stuck with numpad mode: Double hit F6 or fn + F6.
+	I've been using this config since the very first day, both bluetooth and cable with no problem.
+
+Alternative config:
+	For step 1: you can just do "echo 2 | tee sudo /sys/module/hid_apple/parameters/fnmode" instead.
+	But the setting will be reset after reboot, so the method above is to make sure that the setting 
+	is permanent after reboot. Also someone recommends to create a udev rule for keychron devices
