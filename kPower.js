@@ -71,14 +71,25 @@ var kBattIndicator = new Lang.Class({
 				Log('Dev added')
 				this.keyboard = this.findKeyboard();
 				this._newProxy();
-
 			});
 		this.subIdRem = dbusCon.signal_subscribe(sender,iname,'DeviceRemoved',null, null,0,() => {
-				Log('Dev removed')
-				this._proxy = null;
-				this.keyboard = null;
-				this.entryItem.label.set_text('Keyboard is removed');
-				this.buttonText.set_text('%');
+				var kb = this.findKeyboard();
+				Log('Hold on! Something has been removed')
+				if (kb === undefined) {
+					Log("Too bad, so sad. It's your keyboard");
+					this._proxy = null;
+					this.keyboard = null;
+					this.entryItem.label.set_text("Too bad, so sad. Keyboard's removed");
+					this.buttonText.set_text('%');
+
+				} else if (kb.native_path != this.keyboard.native_path) {
+					Log("Bad news, Keyboard's removed! Good news, found another one");
+					this.keyboard = kb;
+					this._proxy = null;
+					this._newProxy();
+				} else {
+					Log("Wew!!! not your keyboard");
+				}
 			});
 	},
 
