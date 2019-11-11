@@ -7,7 +7,9 @@ but it should work with any keyboard in general as long as you can find it when 
 INSTALLATION
 ============
 
-To install this extension from git
+The easy way: Install from https://extensions.gnome.org/extension/2170/keyboard-battery/
+
+The other way: install from git
    1. From your terminal, go to "~/.local/share/gnome-shell/extensions"
    2. Clone the source code from git:
 	git clone https://github.com/cobblestone88/kBoardBattery-brightstone8x.gmail.com.git
