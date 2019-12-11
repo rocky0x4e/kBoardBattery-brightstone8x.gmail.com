@@ -52,3 +52,8 @@ Alternative config:
 	For step 1: you can just do "echo 2 | tee sudo /sys/module/hid_apple/parameters/fnmode" instead.
 	But the setting will be reset after reboot, so the method above is to make sure that the setting 
 	is permanent after reboot. Also someone recommends to create a udev rule for keychron devices
+	
+Enable bluetooth fastconnect config:
+	1. Edit the file /etc/bluetooth/main.conf
+	2. Uncomment FastConnectable config and set it to true: FastConnectable = true
+
