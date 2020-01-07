@@ -56,4 +56,6 @@ Alternative config:
 Enable bluetooth fastconnect config:
 	1. Edit the file /etc/bluetooth/main.conf
 	2. Uncomment FastConnectable config and set it to true: FastConnectable = true
+	3. Uncomment ReconnectAttempts=3 (set the value to whatever number that you want)
+	4. Uncomment ReconnectIntervals=3
 
