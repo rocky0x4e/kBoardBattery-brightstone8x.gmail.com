@@ -36,8 +36,9 @@ This extension retrieve device's info using DBusProxy & GlibUPower, if you ever 
       journalctl /usr/bin/gnome-shell | grep kBatt		# this commmand will dump all gnome-shell log ever record
       journalctl -f /usr/bin/gnome-shell | grep kBatt		# this will only show new log
 
-# TIP FOR THOSE WHO'S USING KEYCHRON KEYBOARDS WITH LINUX
+# TIPS FOR THOSE WHO'S USING KEYCHRON KEYBOARDS WITH LINUX 
 ===========================================================
+(you don't to install the extention above for tips bellow)
 
 Here the best setup (I think so :D) for Keychron + Linux
 	Step 1: Set fkeyfirst by:
