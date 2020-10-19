@@ -46,6 +46,7 @@ var kBattIndicator = new Lang.Class({
 
 		this.entryItem = new PopupMenu.PopupMenuItem("-- N/A --");
 		this.menu.addMenuItem(this.entryItem);
+		this.actor.hide();
 
 		Log('dev listener');
 		var uPower_proxy = new PowerManagerProxy(
@@ -81,6 +82,7 @@ var kBattIndicator = new Lang.Class({
 					this.keyboard = null;
 					this.entryItem.label.set_text("Too bad, so sad. Keyboard's removed");
 					this.buttonText.set_text('%');
+					this.actor.hide();
 
 				} else if (kb.native_path != this.keyboard.native_path) {
 					Log("Bad news, Keyboard's removed! Good news, found another one");
@@ -115,6 +117,7 @@ var kBattIndicator = new Lang.Class({
 			text = this.keyboard.model+ ": " + percent;
 			this.entryItem.label.set_text(text);
 			this.buttonText.set_text(percent);
+			this.actor.show();
 		} catch (err) {
 			Log("no batt found ");
 			Log(err.message);
