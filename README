@@ -23,7 +23,6 @@ The other way: install from git
     -> it will never show the %
     -> work arownd: disable then enable the extension again then it should work
    3. Only show battery for 1 keyboard, if you connect more than one then it will show the first keyb found.
-   4. The indicator does not hide when the keyboard is disconnected, but at least it still works when keyboard reconnects
 
 # TROUBLESHOOTING
 ===================
