@@ -49,7 +49,7 @@ Here the best setup (I think so :D) for Keychron + Linux
 	I've been using this config since the very first day, both bluetooth and cable with no problem.
 
 Alternative config:
-	For step 1: you can just do "echo 2 | tee sudo /sys/module/hid_apple/parameters/fnmode" instead.
+	For step 1: you can just do "echo 2 | sudo tee /sys/module/hid_apple/parameters/fnmode" instead.
 	But the setting will be reset after reboot, so the method above is to make sure that the setting 
 	is permanent after reboot. Also someone recommends to create a udev rule for keychron devices
 	
