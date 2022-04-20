@@ -1,11 +1,9 @@
 # DESCRIPTION
-===============
 
 Battery indicator for keyboard. At first, I only want make this extension for my Keychron K2,
 but it should work with any keyboard in general as long as you can find it when running upower -d
-
+![screenshot](Screenshot.png)
 # INSTALLATION
-================
 
 The easy way: Install from https://extensions.gnome.org/extension/2170/keyboard-battery/
 
@@ -16,7 +14,6 @@ The other way: install from git
    3. Restart gnome-shell: Alt + F2, type 'r' then hit Enter
 
 # KNOWN ISSUE
-===============
 
    1. Refresh time is 2 minutes by default (of DBusProxy) not yet figure out how to change it for now. 
    2. Connect keyboard after the extenstion is enable (or after login) - FIXED IN VER 2
@@ -25,7 +22,6 @@ The other way: install from git
    3. Only show battery for 1 keyboard, if you connect more than one then it will show the first keyb found.
 
 # TROUBLESHOOTING
-===================
 
 This extension retrieve device's info using DBusProxy & GlibUPower, if you ever notice any issue with the extension:
    1. First, check if UPower can see your device, this extension can only see you device if UPower does
@@ -36,7 +32,6 @@ This extension retrieve device's info using DBusProxy & GlibUPower, if you ever 
       journalctl -f /usr/bin/gnome-shell | grep kBatt		# this will only show new log
 
 # TIPS FOR THOSE WHO'S USING KEYCHRON KEYBOARDS WITH LINUX 
-===========================================================
 (you don't to install the extention above for tips bellow)
 
 Here the best setup (I think so :D) for Keychron + Linux
